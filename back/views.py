@@ -1,33 +1,46 @@
+from django.contrib import auth
+from back import serializers
 from back.serializers import CandidateSerializer
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from django.http.response import JsonResponse
-
+from django.http.response import HttpResponse, HttpResponseBase, HttpResponseServerError, JsonResponse
+from django.contrib.auth import authenticate as auth_login
 from django.core.files.storage import default_storage
 from back.api import candidates
+from django.contrib.auth.models import User
 
-# Create your views here.
-#@csrf_exempt
-#def departmentApi(request,id=0):
-#    if request.method=='GET':
-#        departments = Departments.objects.all()
-#        departments_serializer = DepartmentSerializer(departments, many=True)
-#        return JsonResponse(departments_serializer.data, safe=False)
 
-#    elif request.method=='POST':
-#        department_data=JSONParser().parse(request)
-#        department_serializer = DepartmentSerializer(data=department_data)
-#        if department_serializer.is_valid():
-#            department_serializer.save()
-#            return JsonResponse("Added Successfully!!" , safe=False)
-#        return JsonResponse("Failed to Add.",safe=False)
 @csrf_exempt
 def addCandidate(request, id=0):
-    pass
+    data = JSONParser().parse(request)
+    serializer = CandidateSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse("ok", safe=False)
+    return JsonResponse("error", safe=False)
 
 @csrf_exempt
 def listCandidates(request, id=0):
     objects = candidates.list_candidates()
     serializer = CandidateSerializer(objects, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+@csrf_exempt
+def register(request):
+    login = request.GET.get('login', '')
+    email = request.GET.get('email', '')
+    password = request.GET.get('password', '')
+    user = User.objects.create_user(login, email, password)
+    user.save()
+    return JsonResponse("ok", safe=False)
+
+@csrf_exempt
+def authenticate(request):
+    login = request.GET.get('login', '')
+    password = request.GET.get('password', '')
+    user = auth_login(username=login, password=password)
+    if user is not None:
+        return JsonResponse("ok", safe=False)
+    else:
+        return JsonResponse("error", safe=False)
