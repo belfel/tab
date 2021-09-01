@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from back.models import Candidates
+from back.models import Candidates, Workers
 from django.contrib.auth.models import User
 
 class CandidateSerializer(serializers.ModelSerializer):
@@ -18,9 +18,15 @@ class CandidateSerializer(serializers.ModelSerializer):
                   'Hired',
                   )
 
-class UserSerializer(serializers.ModelSerializer):
+class WorkerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Workers
         fields = ('ID',
-                'Login'
+                 'Name',
+                 'Surname',
+                 'Birthdate',
+                 'Login',
+                 #'Password',
+                 'Email_address',
+                 'ID_Workers_Role',
                  )

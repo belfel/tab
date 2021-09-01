@@ -1,4 +1,4 @@
-from back import Recruitment_Meetings
+from back.models import Recruitment_Meetings
 
 
 def add_interview(date, recruitment_process_id, worker_ids):
